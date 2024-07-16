@@ -6,6 +6,8 @@ import xml.etree.ElementTree as xml
 from datetime import datetime
 from urllib.parse import urlsplit
 import markdown
+from markdown import Extension
+from markdown.treeprocessors import Treeprocessor
 
 REPOSITORY = 'kjarosh/ruffle'
 
@@ -15,6 +17,51 @@ def get_filename_from_url(url=None):
         return None
     urlpath = urlsplit(url).path
     return os.path.basename(urlpath)
+
+
+class SanitizeTreeprocessor(Treeprocessor):
+    def __init__(self, md=None):
+        super().__init__(md)
+
+        self.allowed_tags = {'p', 'li', 'ul', 'ol', 'em', 'code'}
+        self.tag_mapping = {
+            'strong': 'em',
+        }
+
+    def run(self, root):
+        self.sanitize(root, None, 0)
+
+    def sanitize(self, element, parent, idx):
+        for idx, child in enumerate(element):
+            self.sanitize(child, element, idx)
+
+        if element.tag in self.tag_mapping.keys():
+            element.tag = self.tag_mapping.get(element.tag)
+
+        if parent is not None and element.tag not in self.allowed_tags:
+            if idx == 0:
+                parent.text += self.to_text(element)
+            else:
+                parent[idx - 1].tail += self.to_text(element)
+            parent.remove(element)
+
+    def to_text(self, element):
+        result = element.text
+        for child in element:
+            result += self.to_text(child)
+        result += element.tail
+        return result
+
+
+class SanitizeExtension(Extension):
+    def extendMarkdown(self, md):
+        md.treeprocessors.register(SanitizeTreeprocessor(md), 'sanitize', 0)
+
+
+def generate_metainfo_description(description):
+    md = markdown.markdown(description, extensions=[SanitizeExtension()])
+    description_html = '<description>' + md + '</description>'
+    return xml.ElementTree(xml.fromstring(description_html)).getroot()
 
 
 def generate_metainfo_artifacts(tag_name, json_release):
@@ -87,7 +134,6 @@ def generate_metainfo_release(tag_name):
     version = tag_name.lstrip('v')
     date = datetime.fromisoformat(json_release['publishedAt']).strftime('%Y-%m-%d')
     url = json_release['url']
-    description = '<description>' + markdown.markdown(json_release['body']) + '</description>'
     release_type = 'snapshot' if json_release['isPrerelease'] else 'stable'
 
     print(f'  Version: {version}')
@@ -104,7 +150,7 @@ def generate_metainfo_release(tag_name):
     xml_url = xml.Element('url')
     xml_url.text = url
 
-    xml_description = xml.ElementTree(xml.fromstring(description)).getroot()
+    xml_description = generate_metainfo_description(json_release['body'])
 
     xml_artifacts = generate_metainfo_artifacts(tag_name, json_release)
 
