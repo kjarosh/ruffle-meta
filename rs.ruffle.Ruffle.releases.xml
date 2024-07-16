@@ -15,6 +15,21 @@
                 <filename>ruffle-0.20.0-linux-x86_64.tar.gz</filename>
                 <size type="download">14700404</size>
             </artifact>
+            <artifact type="binary" platform="any-macos-any">
+                <location>https://github.com/kjarosh/ruffle/releases/download/v0.20.0/ruffle-0.20.0-macos-universal.tar.gz</location>
+                <filename>ruffle-0.20.0-macos-universal.tar.gz</filename>
+                <size type="download">32840527</size>
+            </artifact>
+            <artifact type="binary" platform="i386-windows-msvc">
+                <location>https://github.com/kjarosh/ruffle/releases/download/v0.20.0/ruffle-0.20.0-windows-x86_32.zip</location>
+                <filename>ruffle-0.20.0-windows-x86_32.zip</filename>
+                <size type="download">9770183</size>
+            </artifact>
+            <artifact type="binary" platform="x86_64-windows-msvc">
+                <location>https://github.com/kjarosh/ruffle/releases/download/v0.20.0/ruffle-0.20.0-windows-x86_64.zip</location>
+                <filename>ruffle-0.20.0-windows-x86_64.zip</filename>
+                <size type="download">10518725</size>
+            </artifact>
         </artifacts>
     </release>
     <release version="0.19.2" date="2024-07-16" type="stable">
