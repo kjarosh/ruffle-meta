@@ -1,4 +1,22 @@
 <releases>
+    <release version="0.20.0" date="2024-07-16" type="stable">
+        <url>https://github.com/kjarosh/ruffle/releases/tag/v0.20.0</url>
+        <description>
+            <p>
+                <strong>Full Changelog</strong>: https://github.com/kjarosh/ruffle/compare/v0.19.2...v0.20.0</p>
+        </description>
+        <artifacts>
+            <artifact type="source">
+                <location>https://github.com/kjarosh/ruffle/archive/refs/tags/v0.20.0.zip</location>
+                <filename>ruffle-v0.20.0.zip</filename>
+            </artifact>
+            <artifact type="binary" platform="x86_64-linux-gnu">
+                <location>https://github.com/kjarosh/ruffle/releases/download/v0.20.0/ruffle-0.20.0-linux-x86_64.tar.gz</location>
+                <filename>ruffle-0.20.0-linux-x86_64.tar.gz</filename>
+                <size type="download">14700404</size>
+            </artifact>
+        </artifacts>
+    </release>
     <release version="0.19.2" date="2024-07-16" type="stable">
         <url>https://github.com/kjarosh/ruffle/releases/tag/v0.19.2</url>
         <description>
