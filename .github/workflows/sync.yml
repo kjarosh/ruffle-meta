@@ -1,0 +1,53 @@
+name: Synchronize
+
+on:
+  # Manual dispatch
+  workflow_dispatch:
+
+  # Dispatched automatically after release
+  repository_dispatch:
+    types: [sync]
+
+jobs:
+  update:
+    name: Synchronize
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r ./.github/workflows/requirements.txt
+
+      - name: Run synchronization
+        run: python ./.github/workflows/sync.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Git diff
+        id: diff
+        continue-on-error: true
+        run: |
+          ! git diff --exit-code
+
+      - name: Git commit
+        if: steps.diff.outcome == 'success'
+        run: |
+          git config user.name "RuffleBuild"
+          git config user.email "ruffle@ruffle.rs"
+          git add rs.ruffle.Ruffle.releases.xml
+          git commit -m "Synchronize metainfo"
+
+      - name: Git push
+        if: github.repository == 'kjarosh/ruffle-meta' && steps.diff.outcome == 'success'
+        uses: ad-m/github-push-action@master
+        with:
+          repository: kjarosh/ruffle-meta
+#          github_token: ${{ secrets.RUFFLE_BUILD_TOKEN }}
+          force: false
